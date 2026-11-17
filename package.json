@@ -1,0 +1,24 @@
+{
+  "name": "sfdevs-agendamentos-api",
+  "version": "1.0.0",
+  "description": "API de demonstração do seminário T01 · Docker avançado (DevOps Tools · UNINASSAU) — grupo SF Devs",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node --test"
+  },
+  "author": "SF Devs — Álvaro, Vinicius e Arthur",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "supertest": "^7.3.2"
+  }
+}

@@ -1,0 +1,22 @@
+# ------------------------------------------------------------------
+# BUILD A — "ingênua" (o Dockerfile que funciona, mas não deveria ir
+# para produção). Erros propositais, para comparar com o Dockerfile:
+#   1. Imagem base completa (Debian + ferramentas de build) → imagem grande
+#   2. COPY . . antes do npm install → qualquer mudança no código
+#      invalida o cache e reinstala TODAS as dependências
+#   3. npm install (não determinístico) e com devDependencies
+#   4. Um único estágio: tudo o que foi usado no build vai junto
+#   5. Nenhuma instrução USER → o processo roda como root (UID 0)
+#   6. Sem HEALTHCHECK
+# ------------------------------------------------------------------
+FROM node:24
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+EXPOSE 3000
+
+CMD ["npm", "start"]

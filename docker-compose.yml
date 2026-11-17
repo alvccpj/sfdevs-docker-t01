@@ -1,0 +1,26 @@
+# Mesma execução da Parte 3 da demo, só que declarativa.
+# Uso: docker compose up -d --build   |   docker compose down
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app:optimized
+    container_name: api-compose
+    ports:
+      - "3000:3000"
+    # --- execução sem privilégios ---
+    user: "node"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # --- limites de recursos (cgroups) ---
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.5
+    pids_limit: 100
+    restart: "no"

@@ -1,0 +1,3 @@
+# Garante LF nos scripts mesmo clonando no Windows (senão o bash quebra com \r)
+*.sh text eol=lf
+Dockerfile* text eol=lf

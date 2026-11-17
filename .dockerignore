@@ -1,0 +1,15 @@
+# Evita mandar lixo (e segredos) para o contexto de build
+node_modules
+npm-debug.log*
+.git
+.gitignore
+.gitattributes
+.env
+.env.*
+*.md
+docs
+scripts
+Dockerfile*
+docker-compose*.yml
+.vscode
+.idea
