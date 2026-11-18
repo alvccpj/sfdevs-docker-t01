@@ -78,7 +78,8 @@ echo "Build A: consigo escrever em /etc?"
 rodar docker run --rm app:naive sh -c 'touch /etc/invasao && echo "ESCREVEU em /etc (root!)"'
 echo
 echo "Build B: consigo escrever em /etc? E no código da aplicação?"
-rodar docker run --rm app:optimized sh -c 'touch /etc/invasao 2>&1; touch /app/src/app.js 2>&1'
+rodar docker run --rm app:optimized sh -c 'touch /etc/invasao 2>&1; touch /app/src/app.js 2>&1; ls -l /app/src'
+echo "(arquivos com dono root e sem escrita para outros: o usuário node só consegue ler)"
 pausa
 
 echo "Build B + reforços: --read-only, --cap-drop ALL, no-new-privileges"

@@ -19,8 +19,10 @@ RUN npm ci
 COPY src ./src
 COPY test ./test
 
-# Build falha se os testes falharem. Depois, poda as devDependencies.
-RUN npm test && npm prune --omit=dev
+# Build falha se os testes falharem. Depois, poda as devDependencies e
+# tira a permissão de escrita de grupo/outros (o checkout pode vir com 666,
+# e o COPY preserva as permissões).
+RUN npm test && npm prune --omit=dev && rm -rf test && chmod -R go-w /app
 
 # ---------- Estágio 2: runtime ----------
 FROM node:${NODE_VERSION}-alpine AS runtime
@@ -34,8 +36,8 @@ WORKDIR /app
 # como "node": a aplicação consegue LER o próprio código, mas não
 # consegue ALTERÁ-LO se for comprometida.
 COPY --from=builder /app/node_modules ./node_modules
-COPY package.json ./
-COPY src ./src
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/src ./src
 
 # Usuário sem privilégios que já existe na imagem oficial (UID 1000).
 USER node

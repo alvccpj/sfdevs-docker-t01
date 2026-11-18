@@ -53,11 +53,21 @@ Registrem as versões usadas na apresentação (o professor pede "versões regis
 
 | Item | Comando | Versão usada |
 |---|---|---|
-| Docker Engine | `docker version --format "{{.Server.Version}}"` | _preencher_ |
-| Docker Compose | `docker compose version` | _preencher_ |
-| Imagem base A | `node:24` | Node 24 |
-| Imagem base B | `node:24-alpine` | Node 24 |
-| Sistema operacional | — | _preencher_ |
+| Docker Engine | `docker version --format "{{.Server.Version}}"` | 29.9.2-2 |
+| Docker Compose | `docker compose version` | v5.6.1 |
+| Imagem base A | `node:24` | Node 24 (Debian) |
+| Imagem base B | `node:24-alpine` | Node 24.22.3 · Alpine 3.24 |
+| Sistema operacional | `cat /etc/os-release` | Ubuntu 24.04.5 LTS (GitHub Codespaces, linux/amd64) |
+
+### Rodar sem Docker na máquina: GitHub Codespaces
+
+Se o seu computador não roda Docker (por exemplo, um notebook corporativo sem WSL 2), use o Codespaces. Ele já vem com Docker:
+
+1. Abra https://codespaces.new/alvccpj/sfdevs-docker-t01, ou use **Code → Codespaces → Create codespace on master** no repositório.
+2. No terminal: `docker version` e depois `bash scripts/demo.sh`.
+3. Ao terminar, pare o codespace para não consumir a cota gratuita.
+
+Os resultados abaixo foram medidos nesse ambiente.
 
 > O script `scripts/demo.sh` grava as versões e os resultados medidos na pasta `resultados/`.
 
@@ -163,15 +173,22 @@ docker compose down
 | HEALTHCHECK | não | sim |
 | PID 1 | `npm` (repassa sinais mal) | `node` (recebe o SIGTERM do `docker stop`) |
 
-### Resultados medidos (preencher depois de rodar)
+### Resultados medidos (GitHub Codespaces, 18/11/2026)
 
 | Métrica | A (naive) | B (optimized) |
 |---|---|---|
-| Tamanho da imagem | | |
-| Nº de camadas | | |
-| Tempo do 1º build | | |
-| Tempo do rebuild após mudar 1 linha | | |
-| Usuário (`id`) | | |
+| Tamanho da imagem (descompactada) | 1577 MB | **237 MB** (−85%) |
+| Tamanho de download (compactada) | 414 MB | **63,2 MB** |
+| Nº de camadas | 11 | 8 |
+| Tempo do 1º build (inclui baixar a base) | 93 s | **21 s** |
+| Rebuild após mudar 1 linha | `RUN npm install` executa de novo | `RUN npm ci` → **CACHED** |
+| Usuário (`id`) | `uid=0(root)` | `uid=1000(node)` |
+| Escrita em `/etc` | permitida | `Permission denied` |
+| CPU durante `/cpu` (`--cpus=0.5`) | — | **50,32%** |
+| Limites no `docker inspect` | — | `Memoria=134217728 Swap=134217728 NanoCpus=500000000 PIDs=100 ReadOnly=true` |
+| `/stress?mb=400` (`--memory=128m`) | — | `Status=exited OOMKilled=true ExitCode=137` |
+
+> **Sobre o teste de cache:** como a API tem poucas dependências (só o Express), os dois rebuilds levaram cerca de 5 s. A evidência é a linha `CACHED`: na B, o `npm ci` vem do cache; na A, o `npm install` roda de novo a cada mudança no código. Em projetos com centenas de dependências, essa diferença vira minutos.
 
 ---
 
@@ -186,8 +203,8 @@ docker compose down
 ## Checklist antes da apresentação
 
 - [ ] Rodar `docker pull node:24 node:24-alpine` antes, para não depender da rede da sala
-- [ ] Rodar `bash scripts/demo.sh` uma vez de ponta a ponta e preencher as tabelas acima
-- [ ] Copiar os números medidos para os slides de comparação e de interpretação
+- [x] Rodar `bash scripts/demo.sh` uma vez de ponta a ponta e preencher as tabelas acima
+- [x] Copiar os números medidos para os slides de comparação e de interpretação
 - [ ] Testar se o link do repositório abre sem login, para o formulário de entrega
 
 ## Limpeza
